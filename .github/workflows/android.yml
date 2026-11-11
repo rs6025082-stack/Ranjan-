@@ -1,0 +1,40 @@
+
+name: Build SHRI AI APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Extract ZIP
+        run: |
+          unzip -o SHRI_AI_Android_Starter.zip -d project
+          find project -name gradlew -o -name build.gradle
+
+      - name: Build APK
+        run: |
+          cd project
+          gradle assembleDebug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: SHRI-AI-APK
+          path: project/**/build/outputs/apk/debug/*.apk
